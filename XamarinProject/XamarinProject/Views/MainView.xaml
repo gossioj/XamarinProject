@@ -14,17 +14,27 @@
                 Text="Foreign Exchange"
                 TextColor="OrangeRed" />
             <Label FontAttributes="Bold" Text="Amount:" />
-            <Entry Placeholder="Enter" />
+            <Entry Placeholder="Enter" Text="{Binding Amount, Mode=TwoWay}" />
             <Label FontAttributes="Bold" Text="Source rate:" />
-            <Picker Title="Select source" />
+            <Picker
+                Title="Select source"
+                ItemDisplayBinding="{Binding Name}"
+                ItemsSource="{Binding Rates}"
+                SelectedItem="{Binding SourceRate, Mode=TwoWay}" />
             <Label FontAttributes="Bold" Text="Target rate:" />
-            <Picker Title="Select target" />
-            <ActivityIndicator />
+            <Picker
+                Title="Select target"
+                ItemDisplayBinding="{Binding Name}"
+                ItemsSource="{Binding Rates}"
+                SelectedItem="{Binding TargetRate, Mode=TwoWay}" />
+            <ActivityIndicator IsRunning="{Binding IsRunning, Mode=TwoWay}" />
             <Button
                 BackgroundColor="Navy"
                 BorderRadius="20"
+                Command="{Binding ConvertCommand}"
                 FontAttributes="Bold"
                 HeightRequest="40"
+                IsEnabled="{Binding IsEnabled, Mode=TwoWay}"
                 Text="Convert"
                 TextColor="White" />
             <Label
@@ -32,7 +42,7 @@
                 BackgroundColor="Silver"
                 FontSize="Large"
                 HorizontalTextAlignment="Center"
-                Text="Loading..."
+                Text="{Binding Result, Mode=TwoWay}"
                 VerticalOptions="FillAndExpand"
                 VerticalTextAlignment="Center" />
         </StackLayout>

@@ -14,6 +14,7 @@ namespace XamarinProject
             InitializeComponent();    
             
             MainPage = new MainView();
+
         }
 
        

@@ -5,8 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     BackgroundColor="Yellow"
     BindingContext="{Binding Main, Source={StaticResource Locator}}">
+    <ContentPage.Padding>
+        <OnPlatform
+            x:TypeArguments="Thickness"
+            Android="10"
+            iOS="20,30,20,10" />
+    </ContentPage.Padding>
     <ContentPage.Content>
-        <StackLayout Padding="10,20,10,10">
+        <StackLayout>
             <Label
                 FontAttributes="Bold"
                 FontSize="Large"

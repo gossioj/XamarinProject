@@ -74,19 +74,13 @@
                     Grid.RowSpan="2"
                     Grid.Column="2"
                     HeightRequest="40"
-                    Source="icon.png"
+                    Source="cambiar.png"
                     WidthRequest="40">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding SwitchCommand}"/>
+                        <TapGestureRecognizer Command="{Binding SwitchCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
             </Grid>
-
-
-
-
-
-
             <ActivityIndicator IsRunning="{Binding IsRunning, Mode=TwoWay}" />
             <Button
                 BackgroundColor="Navy"

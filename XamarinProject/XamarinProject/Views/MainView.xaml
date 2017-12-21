@@ -3,7 +3,7 @@
     x:Class="XamarinProject.Views.MainView"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    BackgroundColor="Yellow"
+    BackgroundColor="LightGray"
     BindingContext="{Binding Main, Source={StaticResource Locator}}">
     <ContentPage.Padding>
         <OnPlatform
@@ -14,25 +14,79 @@
     <ContentPage.Content>
         <StackLayout>
             <Label
+                Margin="10"
                 FontAttributes="Bold"
                 FontSize="Large"
                 HorizontalOptions="Center"
                 Text="Foreign Exchange"
                 TextColor="OrangeRed" />
-            <Label FontAttributes="Bold" Text="Amount:" />
-            <Entry Placeholder="Enter" Text="{Binding Amount, Mode=TwoWay}" />
-            <Label FontAttributes="Bold" Text="Source rate:" />
-            <Picker
-                Title="Select source"
-                ItemDisplayBinding="{Binding Name}"
-                ItemsSource="{Binding Rates}"
-                SelectedItem="{Binding SourceRate, Mode=TwoWay}" />
-            <Label FontAttributes="Bold" Text="Target rate:" />
-            <Picker
-                Title="Select target"
-                ItemDisplayBinding="{Binding Name}"
-                ItemsSource="{Binding Rates}"
-                SelectedItem="{Binding TargetRate, Mode=TwoWay}" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".7*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width=".5*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    FontAttributes="Bold"
+                    Text="Amount:" />
+                <Entry
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Placeholder="Enter"
+                    Text="{Binding Amount, Mode=TwoWay}"
+                    VerticalOptions="Center" />
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    FontAttributes="Bold"
+                    Text="Source rate:" />
+                <Picker
+                    Title="Select source"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding Rates}"
+                    SelectedItem="{Binding SourceRate, Mode=TwoWay}"
+                    VerticalOptions="Center" />
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    FontAttributes="Bold"
+                    Text="Target rate:" />
+                <Picker
+                    Title="Select target"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding Rates}"
+                    SelectedItem="{Binding TargetRate, Mode=TwoWay}"
+                    VerticalOptions="Center" />
+                <Image
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
+                    Grid.Column="2"
+                    HeightRequest="40"
+                    Source="icon.png"
+                    WidthRequest="40">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SwitchCommand}"/>
+                    </Image.GestureRecognizers>
+                </Image>
+            </Grid>
+
+
+
+
+
+
             <ActivityIndicator IsRunning="{Binding IsRunning, Mode=TwoWay}" />
             <Button
                 BackgroundColor="Navy"

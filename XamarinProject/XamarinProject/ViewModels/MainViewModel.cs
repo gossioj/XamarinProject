@@ -98,6 +98,15 @@ namespace XamarinProject.ViewModels
 
         // Commands
         public ICommand ConvertCommand => new RelayCommand(Convert);
+        public ICommand SwitchCommand => new RelayCommand(Switch);
+
+        private void Switch()
+        {
+            var aux = this.SourceRate;
+            this.SourceRate = this.TargetRate;
+            this.TargetRate = aux;
+            Convert();
+        }
 
         private async void Convert()
         {

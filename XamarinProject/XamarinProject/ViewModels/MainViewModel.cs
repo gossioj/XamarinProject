@@ -43,12 +43,62 @@ namespace XamarinProject.ViewModels
             }
         }
 
+        private bool isLabelSourceRateVisible;
+
+        public bool IsLabelSourceRateVisible
+        {
+            get { return isLabelSourceRateVisible; }
+            set
+            {
+                isLabelSourceRateVisible = value;
+                Notificar();
+            }
+        }
+
+
         private Rate sourceRate;
 
         public Rate SourceRate
         {
             get { return sourceRate; }
-            set { sourceRate = value;
+            set
+            {
+                sourceRate = value;
+                if (sourceRate != null)
+                {
+                    this.IsLabelSourceRateVisible = true;
+                    this.IsGridVisibleTaxRate = true;
+                }               
+
+                Notificar();
+            }
+        }
+
+       
+        private string flagSourcetUrl;
+
+        public string FlagSourcetUrl
+        {
+            get { return flagSourcetUrl; }
+            set { flagSourcetUrl = value;
+                Notificar();
+            }
+        }
+
+        private string flagTargetUrl;
+
+        public string FlagTargetUrl
+        {
+            get { return flagTargetUrl; }
+            set { flagTargetUrl = value; }
+        }
+
+        private bool isLabelTargetRateVisible;
+
+        public bool IsLabelTargetRateVisible
+        {
+            get { return isLabelTargetRateVisible; }
+            set { isLabelTargetRateVisible = value;
                 Notificar();
             }
         }
@@ -58,7 +108,15 @@ namespace XamarinProject.ViewModels
         public Rate TargetRate
         {
             get { return targetRate; }
-            set { targetRate = value;
+            set
+            {
+                targetRate = value;
+                if (targetRate != null)
+                {
+                    this.IsLabelTargetRateVisible = true;
+                    this.IsGridVisibleTaxRate = true;
+                }               
+
                 Notificar();
             }
         }
@@ -95,6 +153,26 @@ namespace XamarinProject.ViewModels
             }
         }
 
+        private List<Country> countriesAsync;
+
+        public List<Country> CountriesAsync
+        {
+            get { return countriesAsync; }
+            set { countriesAsync = value;
+                Notificar();
+            }
+        }
+
+        private bool isGridVisibleTaxRate;
+
+        public bool IsGridVisibleTaxRate
+        {
+            get { return isGridVisibleTaxRate; }
+            set { isGridVisibleTaxRate = value;
+                Notificar();
+            }
+        }
+
 
         // Commands
         public ICommand ConvertCommand => new RelayCommand(Convert);
@@ -105,7 +183,7 @@ namespace XamarinProject.ViewModels
             var aux = this.SourceRate;
             this.SourceRate = this.TargetRate;
             this.TargetRate = aux;
-            Convert();
+            //Convert();
         }
 
         private async void Convert()
@@ -138,6 +216,8 @@ namespace XamarinProject.ViewModels
                 return;
             }
 
+            SetFlag();
+
             var amountConverted = amountLocal / 
                 (decimal)this.SourceRate.TaxRate *
                 (decimal)this.TargetRate.TaxRate;
@@ -145,16 +225,71 @@ namespace XamarinProject.ViewModels
             this.Result = $"{this.SourceRate.Code} {amountLocal:C2} = {this.TargetRate.Code} {amountConverted:C2}";
         }
 
+        void SetFlag()
+        {
+            
+            foreach (var itemCountry in this.CountriesAsync)
+            {
+                foreach (var itemCurrency in itemCountry.currencies)
+                {
+                    if (itemCurrency.code == this.SourceRate.Code)
+                    {
+                        this.FlagSourcetUrl = itemCountry.flag;
+                    }
+
+                    if (itemCurrency.code == this.TargetRate.Code)
+                    {
+                        this.FlagTargetUrl = itemCountry.flag;
+                    }
+                }
+            }
+        }
+
         //Constructor
         public MainViewModel()
         {
+            this.IsLabelTargetRateVisible = false;
+            this.IsLabelSourceRateVisible = false;
+            this.IsRunning = false;
+            this.IsGridVisibleTaxRate = false;
             LoadRate();
+            LoadFlag();
+        }
+
+        public async void LoadFlag()
+        {
+            
+            try
+            {
+                this.CountriesAsync = new List<Country>();
+                var client = new HttpClient();               
+                var response = await client.GetAsync("http://restcountries.eu/rest/v2/all");
+                var resultAsync = await response.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode)
+                {
+                    return;
+                }
+
+                this.CountriesAsync.Clear();
+                this.CountriesAsync = JsonConvert.DeserializeObject<List<Country>>(resultAsync);
+               // this.Rates = new ObservableCollection<Country>(ratesAsync);
+
+                //this.IsRunning = false;
+                //this.Result = "Ready to Convert";
+               // this.IsEnabled = true;
+            }
+            catch (Exception e)
+            {
+                //this.IsRunning = false;
+                this.Result = $"Error: {e.Message}";
+            }
         }
 
         public async void LoadRate()
         {
             this.IsRunning = true;
             this.Result = "Loading rates...";
+            
 
             try
             {
@@ -167,6 +302,7 @@ namespace XamarinProject.ViewModels
                 {
                     this.IsRunning = false;
                     this.Result = resultAsync;
+                    return;
                 }
 
                 var ratesAsync = JsonConvert.DeserializeObject<List<Rate>>(resultAsync);

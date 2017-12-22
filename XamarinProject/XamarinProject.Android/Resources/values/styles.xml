@@ -2,7 +2,7 @@
 <resources>
   <style name="Theme.Splah"
          parent ="android:Theme">
-    <item name="android:windowBackground">@drawable/Splashscreen</item>
+    <item name="android:windowBackground">@drawable/euro</item>
     <item name="android:windowNoTitle">true</item>
   </style>
   

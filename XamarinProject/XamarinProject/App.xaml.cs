@@ -5,14 +5,15 @@ using System.Text;
 using XamarinProject.Views;
 using Xamarin.Forms;
 
+
 namespace XamarinProject
 {
     public partial class App : Application
     {
         public App()
         {
-            InitializeComponent();    
-            
+            InitializeComponent();
+          
             MainPage = new MainView();
 
         }

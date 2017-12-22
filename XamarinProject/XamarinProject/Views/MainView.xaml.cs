@@ -14,7 +14,7 @@ namespace XamarinProject.Views
     {
         public MainView()
         {
-            InitializeComponent();
+            InitializeComponent();           
         }
     }
 }

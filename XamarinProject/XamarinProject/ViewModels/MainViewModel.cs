@@ -9,26 +9,33 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Xamarin.Forms;
+using ApiService;
 
 namespace XamarinProject.ViewModels
 {
     public class MainViewModel: INotifyPropertyChanged
     {
-        // Events
+        #region Events
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void Notificar([CallerMemberName] string Propiedad = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(Propiedad));
-        } 
+        }
+        #endregion
 
-        // Region Poperties
+        #region Properties
+
+        public ApiServiceRest ApiService { get; set; }
+
         private string amount;
 
         public string Amount
         {
             get { return amount; }
-            set { amount = value;
+            set
+            {
+                amount = value;
                 Notificar();
             }
         }
@@ -38,7 +45,9 @@ namespace XamarinProject.ViewModels
         public ObservableCollection<Rate> Rates
         {
             get { return rates; }
-            set { rates = value;
+            set
+            {
+                rates = value;
                 Notificar();
             }
         }
@@ -76,19 +85,21 @@ namespace XamarinProject.ViewModels
                     {
                         this.IsGridVisibleTaxRate = false;
                     }
-                }               
+                }
 
                 Notificar();
             }
         }
 
-       
+
         private string flagSourcetUrl;
 
         public string FlagSourcetUrl
         {
             get { return flagSourcetUrl; }
-            set { flagSourcetUrl = value;
+            set
+            {
+                flagSourcetUrl = value;
                 Notificar();
             }
         }
@@ -106,7 +117,9 @@ namespace XamarinProject.ViewModels
         public bool IsLabelTargetRateVisible
         {
             get { return isLabelTargetRateVisible; }
-            set { isLabelTargetRateVisible = value;
+            set
+            {
+                isLabelTargetRateVisible = value;
                 Notificar();
             }
         }
@@ -142,7 +155,9 @@ namespace XamarinProject.ViewModels
         public bool IsRunning
         {
             get { return isRunning; }
-            set { isRunning = value;
+            set
+            {
+                isRunning = value;
                 Notificar();
             }
         }
@@ -152,19 +167,23 @@ namespace XamarinProject.ViewModels
         public bool IsEnabled
         {
             get { return isEnabled; }
-            set { isEnabled = value;
+            set
+            {
+                isEnabled = value;
                 Notificar();
             }
         }
 
         private string result;
 
-       
+
 
         public string Result
         {
             get { return result; }
-            set { result = value;
+            set
+            {
+                result = value;
                 Notificar();
             }
         }
@@ -174,7 +193,9 @@ namespace XamarinProject.ViewModels
         public List<Country> CountriesAsync
         {
             get { return countriesAsync; }
-            set { countriesAsync = value;
+            set
+            {
+                countriesAsync = value;
                 Notificar();
             }
         }
@@ -184,28 +205,32 @@ namespace XamarinProject.ViewModels
         public bool IsGridVisibleTaxRate
         {
             get { return isGridVisibleTaxRate; }
-            set { isGridVisibleTaxRate = value;
+            set
+            {
+                isGridVisibleTaxRate = value;
                 Notificar();
             }
         }
+        #endregion
 
-
-        // Commands
+        #region Commands
         public ICommand UpdateCommand => new RelayCommand(Update);
         public ICommand ConvertCommand => new RelayCommand(Convert);
         public ICommand SwitchCommand => new RelayCommand(Switch);
+        #endregion
 
+        #region Methods
         private void Update()
         {
-           // System.Threading.Thread.Sleep(2000);
+            // System.Threading.Thread.Sleep(2000);
             LoadRate();
-           /* await Application.Current.MainPage.DisplayAlert(
-                    "Updated",
-                    "Tax Rates have been updated.",
-                    "Ok");*/
+            /* await Application.Current.MainPage.DisplayAlert(
+                     "Updated",
+                     "Tax Rates have been updated.",
+                     "Ok");*/
         }
 
-            private void Switch()
+        private void Switch()
         {
             var aux = this.SourceRate;
             this.SourceRate = this.TargetRate;
@@ -245,7 +270,7 @@ namespace XamarinProject.ViewModels
 
             SetFlag();
 
-            var amountConverted = amountLocal / 
+            var amountConverted = amountLocal /
                 (decimal)this.SourceRate.TaxRate *
                 (decimal)this.TargetRate.TaxRate;
 
@@ -254,7 +279,7 @@ namespace XamarinProject.ViewModels
 
         void SetFlag()
         {
-            
+
             foreach (var itemCountry in this.CountriesAsync)
             {
                 foreach (var itemCurrency in itemCountry.currencies)
@@ -272,24 +297,13 @@ namespace XamarinProject.ViewModels
             }
         }
 
-        //Constructor
-        public MainViewModel()
-        {
-            this.IsLabelTargetRateVisible = false;
-            this.IsLabelSourceRateVisible = false;
-            this.IsRunning = false;
-            this.IsGridVisibleTaxRate = false;
-            LoadRate();
-            LoadFlag();
-        }
-
         public async void LoadFlag()
         {
-            
+
             try
             {
                 this.CountriesAsync = new List<Country>();
-                var client = new HttpClient();               
+                var client = new HttpClient();
                 var response = await client.GetAsync("http://restcountries.eu/rest/v2/all");
                 var resultAsync = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
@@ -299,11 +313,11 @@ namespace XamarinProject.ViewModels
 
                 this.CountriesAsync.Clear();
                 this.CountriesAsync = JsonConvert.DeserializeObject<List<Country>>(resultAsync);
-               // this.Rates = new ObservableCollection<Country>(ratesAsync);
+                // this.Rates = new ObservableCollection<Country>(ratesAsync);
 
                 //this.IsRunning = false;
                 //this.Result = "Ready to Convert";
-               // this.IsEnabled = true;
+                // this.IsEnabled = true;
             }
             catch (Exception e)
             {
@@ -316,35 +330,26 @@ namespace XamarinProject.ViewModels
         {
             this.IsRunning = true;
             this.Result = "Loading rates...";
+            var ratesAsync = await this.ApiService.GetList<Rate>("http://apiexchangerates.azurewebsites.net", "/api/rates");
+            this.Rates = new ObservableCollection<Rate>(ratesAsync.Result as List<Rate>);
+            this.IsRunning = false;
+            this.Result = ratesAsync.Message;
+            this.IsEnabled = true;              
             
-
-            try
-            {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri("http://apiexchangerates.azurewebsites.net");
-                var controller = "/api/rates";
-                var response = await client.GetAsync(controller);
-                var resultAsync = await response.Content.ReadAsStringAsync();
-                if (!response.IsSuccessStatusCode)
-                {
-                    this.IsRunning = false;
-                    this.Result = resultAsync;
-                    return;
-                }
-
-                var ratesAsync = JsonConvert.DeserializeObject<List<Rate>>(resultAsync);
-                //this.Rates.Clear();
-                this.Rates = new ObservableCollection<Rate>(ratesAsync);
-
-                this.IsRunning = false;
-                this.Result = "Ready to Convert";
-                this.IsEnabled = true;
-            }
-            catch (Exception e)
-            {
-                this.IsRunning = false;
-                this.Result = $"Error: {e.Message}";
-            }
         }
+        #endregion
+
+        #region Constructor
+        public MainViewModel()
+        {
+            this.IsLabelTargetRateVisible = false;
+            this.IsLabelSourceRateVisible = false;
+            this.IsRunning = false;
+            this.IsGridVisibleTaxRate = false;
+            this.ApiService = new ApiServiceRest();
+            LoadRate();
+            LoadFlag();
+        }
+        #endregion       
     }
 }

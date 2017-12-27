@@ -68,6 +68,14 @@ namespace XamarinProject.ViewModels
                 {
                     this.IsLabelSourceRateVisible = true;
                     this.IsGridVisibleTaxRate = true;
+                }
+                else
+                {
+                    this.IsLabelSourceRateVisible = false;
+                    if (this.TargetRate == null)
+                    {
+                        this.IsGridVisibleTaxRate = false;
+                    }
                 }               
 
                 Notificar();
@@ -115,7 +123,15 @@ namespace XamarinProject.ViewModels
                 {
                     this.IsLabelTargetRateVisible = true;
                     this.IsGridVisibleTaxRate = true;
-                }               
+                }
+                else
+                {
+                    this.IsLabelTargetRateVisible = false;
+                    if (this.SourceRate == null)
+                    {
+                        this.IsGridVisibleTaxRate = false;
+                    }
+                }
 
                 Notificar();
             }
@@ -175,10 +191,21 @@ namespace XamarinProject.ViewModels
 
 
         // Commands
+        public ICommand UpdateCommand => new RelayCommand(Update);
         public ICommand ConvertCommand => new RelayCommand(Convert);
         public ICommand SwitchCommand => new RelayCommand(Switch);
 
-        private void Switch()
+        private void Update()
+        {
+           // System.Threading.Thread.Sleep(2000);
+            LoadRate();
+           /* await Application.Current.MainPage.DisplayAlert(
+                    "Updated",
+                    "Tax Rates have been updated.",
+                    "Ok");*/
+        }
+
+            private void Switch()
         {
             var aux = this.SourceRate;
             this.SourceRate = this.TargetRate;
@@ -190,7 +217,7 @@ namespace XamarinProject.ViewModels
         {
             if (string.IsNullOrEmpty(this.Amount))
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "You must enter a value in amount", "Ok");
+                await Application.Current.MainPage.DisplayAlert("Oops", "You must enter a value in amount", "Ok");
                 return;
             }
 
@@ -198,7 +225,7 @@ namespace XamarinProject.ViewModels
             if (!decimal.TryParse(this.Amount, out amountLocal))
             {
                 await Application.Current.MainPage.DisplayAlert(
-                    "Error",
+                    "Oops",
                     "You must enter a numeric value in amount",
                     "Ok");
                 return;
@@ -206,13 +233,13 @@ namespace XamarinProject.ViewModels
 
             if (this.SourceRate == null)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "You must select a source rate", "Ok");
+                await Application.Current.MainPage.DisplayAlert("Oops", "You must select a source rate", "Ok");
                 return;
             }
 
             if (this.TargetRate == null)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "You must select a target rate", "Ok");
+                await Application.Current.MainPage.DisplayAlert("Oops", "You must select a target rate", "Ok");
                 return;
             }
 
@@ -306,6 +333,7 @@ namespace XamarinProject.ViewModels
                 }
 
                 var ratesAsync = JsonConvert.DeserializeObject<List<Rate>>(resultAsync);
+                //this.Rates.Clear();
                 this.Rates = new ObservableCollection<Rate>(ratesAsync);
 
                 this.IsRunning = false;

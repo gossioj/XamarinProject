@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -12,7 +11,7 @@ using Android.Widget;
 
 namespace XamarinProject.Droid
 {
-    [Activity(Label = "XamarinProject", MainLauncher = true, Theme = "@style/Theme.Splah", NoHistory = true)]
+    [Activity(Label = "Money Exchange", MainLauncher = true, Theme = "@style/Theme.Splah", NoHistory = true)]
     public class SplashActivity : Activity
     {
         protected override void OnCreate(Bundle savedInstanceState)

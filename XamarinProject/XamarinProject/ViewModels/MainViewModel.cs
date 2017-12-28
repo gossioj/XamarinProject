@@ -1,15 +1,12 @@
-﻿using GalaSoft.MvvmLight.Command;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-using XamarinProject.Models;
-using System;
-using System.Net.Http;
-using Newtonsoft.Json;
+﻿using ApiService;
+using GalaSoft.MvvmLight.Command;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using Xamarin.Forms;
-using ApiService;
+using XamarinProject.Models;
 
 namespace XamarinProject.ViewModels
 {
@@ -299,31 +296,9 @@ namespace XamarinProject.ViewModels
 
         public async void LoadFlag()
         {
-
-            try
-            {
-                this.CountriesAsync = new List<Country>();
-                var client = new HttpClient();
-                var response = await client.GetAsync("http://restcountries.eu/rest/v2/all");
-                var resultAsync = await response.Content.ReadAsStringAsync();
-                if (!response.IsSuccessStatusCode)
-                {
-                    return;
-                }
-
-                this.CountriesAsync.Clear();
-                this.CountriesAsync = JsonConvert.DeserializeObject<List<Country>>(resultAsync);
-                // this.Rates = new ObservableCollection<Country>(ratesAsync);
-
-                //this.IsRunning = false;
-                //this.Result = "Ready to Convert";
-                // this.IsEnabled = true;
-            }
-            catch (Exception e)
-            {
-                //this.IsRunning = false;
-                this.Result = $"Error: {e.Message}";
-            }
+            this.CountriesAsync = new List<Country>();
+            var ratesAsync = await this.ApiService.GetList<Country>("http://restcountries.eu", "/rest/v2/all");
+            this.CountriesAsync = ratesAsync.Result as List<Country>;
         }
 
         public async void LoadRate()
@@ -333,7 +308,7 @@ namespace XamarinProject.ViewModels
             var ratesAsync = await this.ApiService.GetList<Rate>("http://apiexchangerates.azurewebsites.net", "/api/rates");
             this.Rates = new ObservableCollection<Rate>(ratesAsync.Result as List<Rate>);
             this.IsRunning = false;
-            this.Result = ratesAsync.Message;
+            this.Result = ratesAsync.IsSuccesful ? "Ready to Convert" : ratesAsync.Message;
             this.IsEnabled = true;              
             
         }

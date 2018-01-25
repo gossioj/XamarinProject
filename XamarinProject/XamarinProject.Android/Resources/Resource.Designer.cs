@@ -27,6 +27,8 @@ namespace XamarinProject.Droid
 		public static void UpdateIdValues()
 		{
 			global::NGraphics.Android.Resource.String.library_name = global::XamarinProject.Droid.Resource.String.library_name;
+			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.ApplicationName = global::XamarinProject.Droid.Resource.String.ApplicationName;
+			global::SQLite.Net.Platform.XamarinAndroid.Resource.String.Hello = global::XamarinProject.Droid.Resource.String.Hello;
 			global::Xamarin.Forms.Svg.Droid.Resource.Animation.abc_fade_in = global::XamarinProject.Droid.Resource.Animation.abc_fade_in;
 			global::Xamarin.Forms.Svg.Droid.Resource.Animation.abc_fade_out = global::XamarinProject.Droid.Resource.Animation.abc_fade_out;
 			global::Xamarin.Forms.Svg.Droid.Resource.Animation.abc_grow_fade_in_from_bottom = global::XamarinProject.Droid.Resource.Animation.abc_grow_fade_in_from_bottom;
@@ -5285,6 +5287,12 @@ namespace XamarinProject.Droid
 		
 		public partial class String
 		{
+			
+			// aapt resource value: 0x7f090040
+			public const int ApplicationName = 2131296320;
+			
+			// aapt resource value: 0x7f09003f
+			public const int Hello = 2131296319;
 			
 			// aapt resource value: 0x7f090015
 			public const int abc_action_bar_home_description = 2131296277;

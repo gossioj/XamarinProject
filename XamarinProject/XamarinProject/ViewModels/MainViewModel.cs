@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Xamarin.Forms;
 using XamarinProject.Models;
+using System;
+using Plugin.Connectivity;
 
 namespace XamarinProject.ViewModels
 {
@@ -22,6 +24,28 @@ namespace XamarinProject.ViewModels
         #endregion
 
         #region Properties
+
+        private string statusValue;
+
+        public string StatusValue
+        {
+            get { return statusValue; }
+            set { statusValue = value;
+                Notificar();
+            }
+        }
+
+
+        private bool status;
+
+        public bool Status
+        {
+            get { return status; }
+            set { status = value;
+                Notificar();
+            }
+        }
+
 
         public ApiServiceRest ApiService { get; set; }
 
@@ -219,7 +243,8 @@ namespace XamarinProject.ViewModels
         #region Methods
         private void Update()
         {
-            // System.Threading.Thread.Sleep(2000);
+            // System.Threading.Thread.Sleep(2000);            
+            ConnectionWifi();
             LoadRate();
             /* await Application.Current.MainPage.DisplayAlert(
                      "Updated",
@@ -296,21 +321,32 @@ namespace XamarinProject.ViewModels
 
         public async void LoadFlag()
         {
+            if (!this.Status)
+            {
+                return;
+            }
+
             this.CountriesAsync = new List<Country>();
-            var ratesAsync = await this.ApiService.GetList<Country>("http://restcountries.eu", "/rest/v2/all");
+            var ratesAsync = await this.ApiService.GetListRest<Country>("http://restcountries.eu", "/rest/v2/all");
             this.CountriesAsync = ratesAsync.Result as List<Country>;
         }
 
         public async void LoadRate()
         {
+            this.StatusValue = string.Empty;
+            if (!this.Status)
+            {
+                return;
+            }
+
             this.IsRunning = true;
             this.Result = "Loading rates...";
-            var ratesAsync = await this.ApiService.GetList<Rate>("http://apiexchangerates.azurewebsites.net", "/api/rates");
+            var ratesAsync = await this.ApiService.GetListRest<Rate>("http://apiexchangerates.azurewebsites.net", "/api/rates");
             this.Rates = new ObservableCollection<Rate>(ratesAsync.Result as List<Rate>);
             this.IsRunning = false;
             this.Result = ratesAsync.IsSuccesful ? "Ready to Convert" : ratesAsync.Message;
-            this.IsEnabled = true;              
-            
+            this.IsEnabled = true;
+            this.StatusValue = "Rate loaded from internet";
         }
         #endregion
 
@@ -320,11 +356,35 @@ namespace XamarinProject.ViewModels
             this.IsLabelTargetRateVisible = false;
             this.IsLabelSourceRateVisible = false;
             this.IsRunning = false;
-            this.IsGridVisibleTaxRate = false;
+            this.IsGridVisibleTaxRate = false;           
+            this.StatusValue = string.Empty;
             this.ApiService = new ApiServiceRest();
+            ConnectionWifi();           
             LoadRate();
             LoadFlag();
         }
-        #endregion       
+
+        private async void ConnectionWifi()
+        {
+            this.Status = true;
+            this.IsRunning = true;
+            if (!CrossConnectivity.Current.IsConnected)
+            {
+                this.Status = CrossConnectivity.Current.IsConnected;
+                this.Result = $"Check your Internet settings";
+                this.IsRunning = false;
+                return;
+            }
+
+            bool hasInternet = await CrossConnectivity.Current.IsReachable("http://www.google.com", 5000);
+            if (!hasInternet)
+            {
+                this.Status = hasInternet;
+                this.Result = $"Check your Internet connection";
+                this.IsRunning = false;
+                return;
+            }           
+        }
+        #endregion
     }
 }

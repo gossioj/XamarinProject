@@ -183,6 +183,7 @@
                     TextColor="LightSeaGreen"
                     VerticalOptions="FillAndExpand"
                     VerticalTextAlignment="Center" />
+                <Label Text="{Binding StatusValue, Mode=TwoWay}" />
 
             </StackLayout>
         </Frame>
